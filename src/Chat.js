@@ -3,9 +3,9 @@ import { createPortal } from "react-dom";
 
 import "./Chat.css"
 const people = [
-    { title: 'Andy', id: 1 },
-    { title: 'Rich', id: 2 },
-    { title: 'Nick', id: 3 },
+    { name: 'Andy', id: 1 },
+    { name: 'Rich', id: 2 },
+    { name: 'Nick', id: 3 },
   ];
 var chatLog = {
     1 : {
@@ -28,9 +28,18 @@ var chatLog = {
             },
         ]
     },
+    3 : {
+        chat: [
+            {
+                id : 1,
+                content: 'what',
+            }
+        ]
+    }
 }
 
 const testContext = createContext("hello world");
+const sendContext = createContext();
 
 function ChatList({setCurId}) {
     function handle(id) {
@@ -38,7 +47,7 @@ function ChatList({setCurId}) {
     }
     const listItems = people.map(product =>
         <li key={product.id} onClick={()=>setCurId(product.id)}>
-          {product.title}
+          {product.name}
         </li>
       );
       
@@ -51,7 +60,8 @@ function ChatList({setCurId}) {
 
 function ChatDisplay() {
     const requiredId = useContext(testContext);
-    const requiredList = chatLog[requiredId].chat.map(text=>
+    const log = useContext(sendContext);
+    const requiredList = log[requiredId].chat.map(text=>
         <div key={text.id}>{text.content}</div>);
     return (
         <div className="chat--display">
@@ -60,34 +70,52 @@ function ChatDisplay() {
     );
 }
 
-function SendMsg({props}) {
+function SendMsg({setLog}) {
     const curId = useContext(testContext);
     const [showModal, setShowModel] = useState(false);
+    const [status, setStatus] = useState(false);
+    const [statusValue, setStatusValue] = useState('success');
+
     return (
         <div className="send--msg">
             <button className="send--msg__button" onClick={()=>{
                 setShowModel(true);
+                setStatus(false);
             }}>msg</button>
             {showModal && createPortal(
-                <MsgModal onClose={()=>setShowModel(false)} props={props}/>,
+                <MsgModal onClose={()=>setShowModel(false)} setShowModel={setShowModel} setStatus={setStatus} setLog={setLog}/>,
                 document.body
+            )}
+            {status && createPortal(
+                <span>{statusValue}</span>, document.body
             )}
         </div>
     );
 }
 
-function MsgModal({ onClose , props}) {
+function MsgModal({ onClose, setShowModel, setStatus, setLog}) {
     const [inputValue, setInputValue] = useState('');
     const curId = useContext(testContext);
     function broadcast() {
+        setStatus(true);
+        setShowModel(false);
+        setTimeout(()=>setStatus(false), 3);
         Object.keys(chatLog).forEach(key => {
-            chatLog[key].chat.push({id: chatLog[curId].length + 1, content: inputValue});
+            chatLog[key].chat.push({id: chatLog[curId].length + 2, content: inputValue});
             setInputValue('');
         })
+        setLog(chatLog);
     }
     function send() {
-        chatLog[curId].chat.push({id: chatLog[curId].length + 1, content: inputValue})
+        setTimeout(()=>setStatus(false), 3000);
+        
+        setStatus(true);
+        setShowModel(false);
+
+
+        chatLog[curId].chat.push({id: chatLog[curId].length + 2, content: inputValue})
         setInputValue('');
+        setLog(chatLog);
     }
     function handleInputChange(event) {
         setInputValue(event.target.value);
@@ -98,23 +126,31 @@ function MsgModal({ onClose , props}) {
             <button onClick={send}>send</button>
             <button onClick={broadcast}>broadcast</button>
             <button onClick={()=>onClose()}>x</button>
-
         </div>
     );
 }
-
+function test() {
+    return (
+        <div>
+            success
+        </div>
+    )
+}
 
 function Chat() {
     const [curId, setCurId] = useState(1);
+    const [log, setLog] = useState(chatLog);
     return (
+        <sendContext.Provider value={log}>
         <testContext.Provider value={curId}>
             <div className="chat">
                 <ChatList setCurId={setCurId}/>
                 <ChatDisplay/>
-                <SendMsg props={setCurId}/>    
+                <SendMsg setLog={setLog}/>    
             </div>
             
         </testContext.Provider>
+        </sendContext.Provider>
     );
 }
 
