@@ -1,0 +1,21 @@
+.chat {
+    margin-top:4em;
+    display:grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 5fr 1fr;
+    height: 50em;
+}
+
+.send--msg {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.send--msg__button {
+    width: 100px;
+    /* float: right; */
+    margin-right: 100px;
+}

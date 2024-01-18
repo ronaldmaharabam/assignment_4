@@ -2,12 +2,21 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import Chat from './Chat';
 import reportWebVitals from './reportWebVitals';
+// import {
+//   createBrowserRouter,
+//   RouterProvider,
+// } from "react-router-dom";
+
+import { createContext } from 'react';
+import {createBrowserRouter, RouterProvider} from 'react-dom/client';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Chat />
   </React.StrictMode>
 );
 
